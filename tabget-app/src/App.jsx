@@ -1,0 +1,591 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Heart, Users, ChevronLeft, ChevronRight, Trophy, Smartphone, RotateCw, Volume2 } from 'lucide-react';
+import SplashScreen from './SplashScreen';
+import './index.css';
+
+const VS_DATA = [
+  {
+    id: 1,
+    itemA: "프리미엄 무선 이어폰",
+    itemB: "최신형 스마트워치",
+    imgA: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=800",
+    imgB: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800",
+    votesA: 12450,
+    votesB: 11820,
+  },
+  {
+    id: 2,
+    itemA: "화이트 스니커즈",
+    itemB: "어글리 슈즈",
+    imgA: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800",
+    imgB: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800",
+    votesA: 8900,
+    votesB: 9200,
+  },
+  {
+    id: 3,
+    itemA: "아이스 아메리카노",
+    itemB: "따뜻한 카페라떼",
+    imgA: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=800",
+    imgB: "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=800",
+    votesA: 15600,
+    votesB: 14200,
+  },
+  {
+    id: 4,
+    itemA: "고성능 게이밍 폰",
+    itemB: "휴대용 게임 콘솔",
+    imgA: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=800",
+    imgB: "https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?auto=format&fit=crop&q=80&w=800",
+    votesA: 7800,
+    votesB: 8500,
+  },
+  {
+    id: 5,
+    itemA: "럭셔리 세단",
+    itemB: "강력한 SUV",
+    imgA: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800",
+    imgB: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800",
+    votesA: 21000,
+    votesB: 19500,
+  },
+];
+
+const CHAT_MESSAGES = [
+  "이거 진짜 최고다 👍",
+  "압도적 1위!",
+  "이미 샀어요 ㅋㅋ",
+  "역시 믿고 선택",
+  "완전 내 스타일 ❤️",
+  "더블클릭 고!!!!",
+  "이벤트 당첨되고 싶다 🙏",
+  "친구한테도 추천했어요",
+  "이게 답이지",
+  "진짜 갖고싶다...",
+  "가격 대비 최고",
+  "벌써 3번째 참여 중",
+  "이거 사면 인생 바뀜",
+  "디자인 미쳤다 😍",
+  "무조건 이쪽",
+  "1등 확실함",
+  "저도 참여했어요!",
+  "이거 실제로 써봤는데 진짜 좋음",
+  "이벤트 당첨 되면 선물할 거예요 🎁",
+  "퀄리티 실화냐",
+];
+
+const NICKNAMES = [
+  "익명의 곰돌이", "행운의 별빛", "구름위의 고양이", "새벽세시반", "핑크노을",
+  "초코라떼", "달빛소나타", "열정파워", "오늘도화이팅", "사탕수수",
+  "포근한이불", "도토리다람쥐", "반짝이는눈", "설레는마음", "봄날의햇살",
+];
+
+function ChatFeed({ active }) {
+  const [messages, setMessages] = useState([]);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (!active) {
+      clearInterval(intervalRef.current);
+      setMessages([]);
+      return;
+    }
+
+    const addMessage = () => {
+      const text = CHAT_MESSAGES[Math.floor(Math.random() * CHAT_MESSAGES.length)];
+      const nick = NICKNAMES[Math.floor(Math.random() * NICKNAMES.length)];
+      setMessages((prev) => {
+        const next = [...prev, { id: Date.now(), nick, text }];
+        return next.slice(-6); // 최대 6개 유지
+      });
+    };
+
+    addMessage();
+    intervalRef.current = setInterval(addMessage, 1200 + Math.random() * 800);
+
+    return () => clearInterval(intervalRef.current);
+  }, [active]);
+
+  if (!active) return null;
+
+  return (
+    <div className="absolute right-0 top-0 bottom-0 w-1/3 flex flex-col justify-end pb-20 px-2 z-10 pointer-events-none overflow-hidden">
+      <div className="flex flex-col gap-1 border border-white/30 rounded-lg p-3">
+        {messages.slice(-3).map((msg, i) => (
+          <div
+            key={msg.id}
+            className="chat-message bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1"
+            style={{ opacity: 0.4 + i * 0.3 }}
+          >
+            <p className="text-green-300 text-[10px] font-bold leading-tight truncate">{msg.nick}</p>
+            <p className="text-white text-[10px] leading-tight">{msg.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [screen, setScreen] = useState('splash'); // 'splash' | 'main' | 'results'
+  const [isPortrait, setIsPortrait] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedSide, setSelectedSide] = useState(null);
+  const [votedSide, setVotedSide] = useState(null);
+  const [showHeart, setShowHeart] = useState({ active: false, x: 0, y: 0 });
+  const [isWinnerRevealed, setIsWinnerRevealed] = useState(false);
+  const [showAlreadyVoted, setShowAlreadyVoted] = useState(false);
+  const alreadyVotedTimerRef = useRef(null);
+  const [displayVotesA, setDisplayVotesA] = useState(() => VS_DATA[0].votesA);
+  const [displayVotesB, setDisplayVotesB] = useState(() => VS_DATA[0].votesB);
+  const heartTimeoutRef = useRef(null);
+  const liveIntervalRef = useRef(null);
+  const animFrameRef = useRef(null);
+
+  const currentSet = VS_DATA[currentIndex];
+  const totalDisplay = displayVotesA + displayVotesB;
+  const pctA = totalDisplay > 0 ? Math.round((displayVotesA / totalDisplay) * 100) : 50;
+  const pctB = totalDisplay > 0 ? 100 - pctA : 50;
+
+  // 선택 시: 0 → 목표값 카운트업 애니메이션
+  const animateCount = (target, setter, onComplete) => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    const duration = 1000;
+    const start = performance.now();
+    const step = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setter(Math.floor(eased * target));
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(step);
+      } else {
+        setter(target);
+        onComplete?.();
+      }
+    };
+    animFrameRef.current = requestAnimationFrame(step);
+  };
+
+  // 단일 클릭: 상품 선택
+  const handleClick = (side) => {
+    if (selectedSide === side) return;
+
+    // 이미 응모한 세트에서 다른 상품 클릭 시 안내 메시지
+    if (votedSide && side !== votedSide) {
+      if (alreadyVotedTimerRef.current) clearTimeout(alreadyVotedTimerRef.current);
+      setShowAlreadyVoted(true);
+      alreadyVotedTimerRef.current = setTimeout(() => setShowAlreadyVoted(false), 2500);
+      return;
+    }
+
+    setSelectedSide(side);
+
+    // 기존 인터벌 정리
+    if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+
+    const targetA = currentSet.votesA;
+    const targetB = currentSet.votesB;
+
+    if (side === 'A') {
+      setDisplayVotesB(targetB); // 반대쪽은 고정
+      setDisplayVotesA(0);
+      animateCount(targetA, setDisplayVotesA, () => {
+        // 카운트업 완료 후 실시간 증가
+        liveIntervalRef.current = setInterval(() => {
+          setDisplayVotesA((v) => v + Math.floor(Math.random() * 5) + 1);
+        }, 1000);
+      });
+    } else {
+      setDisplayVotesA(targetA); // 반대쪽은 고정
+      setDisplayVotesB(0);
+      animateCount(targetB, setDisplayVotesB, () => {
+        liveIntervalRef.current = setInterval(() => {
+          setDisplayVotesB((v) => v + Math.floor(Math.random() * 5) + 1);
+        }, 1000);
+      });
+    }
+  };
+
+  // 세트 변경 시 실제 투표수로 초기화
+  useEffect(() => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+    setDisplayVotesA(VS_DATA[currentIndex].votesA);
+    setDisplayVotesB(VS_DATA[currentIndex].votesB);
+  }, [currentIndex]);
+
+  // 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+    };
+  }, []);
+
+  // 더블클릭: 이벤트 참여 (하트 + 위너 공개)
+  const handleDoubleClick = (side, e) => {
+    setVotedSide(side);
+    setSelectedSide(side);
+
+    setShowHeart({ active: true, x: e.clientX, y: e.clientY });
+    if (heartTimeoutRef.current) clearTimeout(heartTimeoutRef.current);
+    heartTimeoutRef.current = setTimeout(
+      () => setShowHeart((h) => ({ ...h, active: false })),
+      800
+    );
+
+    setTimeout(() => setIsWinnerRevealed(true), 2000);
+    if (navigator.vibrate) navigator.vibrate(80);
+  };
+
+  const resetSet = () => {
+    setSelectedSide(null);
+    setVotedSide(null);
+    setIsWinnerRevealed(false);
+    setShowAlreadyVoted(false);
+    if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (alreadyVotedTimerRef.current) clearTimeout(alreadyVotedTimerRef.current);
+  };
+
+  const nextSet = () => {
+    resetSet();
+    setCurrentIndex((prev) => (prev + 1) % VS_DATA.length);
+  };
+
+  const prevSet = () => {
+    resetSet();
+    setCurrentIndex((prev) => (prev - 1 + VS_DATA.length) % VS_DATA.length);
+  };
+
+  if (screen === 'splash') {
+    return (
+      <SplashScreen
+        onEnter={() => setScreen('main')}
+        onResults={() => setScreen('results')}
+      />
+    );
+  }
+
+  if (screen === 'results') {
+    const WINNERS = [
+      { id: 1, nick: "행운의별빛", review: "진짜 당첨될 줄 몰랐어요!! 너무 행복해요 🎉", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop", prize: "프리미엄 무선 이어폰" },
+      { id: 2, nick: "초코라떼맛", review: "친구한테 자랑했더니 부러워해요 ㅋㅋ 감사합니다!", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop", prize: "최신형 스마트워치" },
+      { id: 3, nick: "봄날햇살77", review: "이런 이벤트 처음인데 당첨되다니 대박 🙏", img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop", prize: "화이트 스니커즈" },
+      { id: 4, nick: "달빛소나타", review: "배송도 빠르고 상품도 너무 좋아요! 또 참여할게요", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop", prize: "아이스 아메리카노 세트" },
+      { id: 5, nick: "포근한이불", review: "반신반의했는데 진짜 당첨!! 믿고 참여하세요 👍", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop", prize: "고성능 게이밍 폰" },
+      { id: 6, nick: "구름위고양이", review: "남자친구랑 같이 했는데 제가 당첨됐어요 😍", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&h=200&fit=crop", prize: "럭셔리 세단 시승권" },
+      { id: 7, nick: "새벽세시반", review: "kt알파쇼핑 이벤트 최고! 매일 참여합니다", img: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=200&h=200&fit=crop", prize: "최신형 스마트워치" },
+      { id: 8, nick: "열정파워맨", review: "상품 퀄리티 실화냐... 너무 만족스러워요 🎁", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop", prize: "휴대용 게임 콘솔" },
+    ];
+
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="relative w-[375px] h-[667px] rounded-[40px] border-[8px] border-zinc-800 shadow-2xl overflow-hidden bg-zinc-950">
+          {/* 헤더 */}
+          <div className="flex flex-col items-center pt-5 pb-3 border-b border-white/10">
+            <h2 className="text-2xl font-black">
+              <span className="text-white">Tap</span>
+              <span style={{ color: '#E30B5C' }}>Get</span>
+              <span className="text-white/40 text-base font-normal ml-2">당첨결과</span>
+            </h2>
+          </div>
+
+          {/* 스크롤 영역 */}
+          <div className="h-full overflow-y-auto pb-20" style={{ scrollbarWidth: 'none' }}>
+            {/* 득표율 섹션 */}
+            <div className="px-5 pt-4 pb-3">
+              <p className="text-white/40 text-[10px] tracking-widest uppercase mb-3">투표 결과</p>
+              {VS_DATA.map((set) => {
+                const total = set.votesA + set.votesB;
+                const pA = Math.round((set.votesA / total) * 100);
+                const pB = 100 - pA;
+                return (
+                  <div key={set.id} className="mb-4">
+                    <div className="flex justify-between text-[11px] text-white/50 mb-1">
+                      <span className="truncate w-28">{set.itemA}</span>
+                      <span className="truncate w-28 text-right">{set.itemB}</span>
+                    </div>
+                    <div className="flex h-2 rounded-full overflow-hidden">
+                      <div className="bg-blue-400" style={{ width: `${pA}%` }} />
+                      <div className="bg-pink-400" style={{ width: `${pB}%` }} />
+                    </div>
+                    <div className="flex justify-between text-[10px] mt-1">
+                      <span className="text-blue-400 font-bold">{pA}%</span>
+                      <span className="text-white/30">{total.toLocaleString()}명</span>
+                      <span className="text-pink-400 font-bold">{pB}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 구분선 */}
+            <div className="mx-5 border-t border-white/10 mb-4" />
+
+            {/* 당첨자 후기 섹션 */}
+            <div className="px-5">
+              <p className="text-white/40 text-[10px] tracking-widest uppercase mb-3">당첨자 후기</p>
+              <div className="grid grid-cols-2 gap-3">
+                {WINNERS.map((w) => (
+                  <div key={w.id} className="bg-white/5 rounded-2xl overflow-hidden border border-white/10">
+                    {/* 인증사진 */}
+                    <div className="relative">
+                      <img src={w.img} alt={w.nick} className="w-full h-24 object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-2 left-2 flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#E30B5C' }} />
+                        <span className="text-white text-[9px] font-bold">{w.nick}</span>
+                      </div>
+                    </div>
+                    {/* 후기 */}
+                    <div className="px-2.5 py-2">
+                      <p className="text-[9px] font-semibold mb-1" style={{ color: '#E30B5C' }}>{w.prize}</p>
+                      <p className="text-white/70 text-[9px] leading-relaxed">{w.review}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="h-16" />
+          </div>
+
+          {/* 메인으로 버튼 - 하단 고정 */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-10 pt-6 bg-gradient-to-t from-zinc-950 to-transparent">
+            <button
+              onClick={() => setScreen('main')}
+              className="group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <div className="absolute -inset-1 rounded-2xl blur-md opacity-50 group-hover:opacity-80 transition-opacity duration-300"
+                style={{ background: 'linear-gradient(135deg, #E30B5C, #ff6b9d)' }} />
+              <div className="relative flex items-center gap-3 px-8 py-4 rounded-2xl shadow-xl"
+                style={{ background: 'linear-gradient(135deg, #E30B5C 0%, #c4084e 100%)' }}>
+                <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-[10px] text-white/60 font-semibold tracking-widest uppercase">Home</span>
+                  <span className="text-base font-black text-white tracking-tight">메인으로</span>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center ml-1">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6h8M6 2l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white font-sans overflow-hidden">
+      {/* Portrait/Landscape 토글 (데모용) */}
+      <div className="fixed top-4 z-50 flex gap-2">
+        <button
+          onClick={() => setIsPortrait(!isPortrait)}
+          className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition"
+        >
+          {isPortrait ? <Smartphone size={18} /> : <RotateCw size={18} />}
+          {isPortrait ? "가로 모드로 보기" : "세로 모드로 보기"}
+        </button>
+      </div>
+
+      {/* 디바이스 프레임 */}
+      <div
+        className={`relative transition-all duration-500 shadow-2xl overflow-hidden
+          ${isPortrait
+            ? 'w-[375px] h-[667px] rounded-[40px] border-[8px] border-zinc-800'
+            : 'w-[667px] h-[375px] rounded-[40px] border-[8px] border-zinc-800'
+          }`}
+      >
+        <div className={`flex w-full h-full ${isPortrait ? 'flex-col' : 'flex-row'}`}>
+
+          {/* Section A */}
+          <div
+            className={`relative flex-1 overflow-hidden transition-all duration-500 cursor-pointer
+              ${isWinnerRevealed && votedSide === 'B' ? 'opacity-40 grayscale blur-sm'
+                : selectedSide === 'A' ? 'opacity-100 ring-4 ring-red-500 ring-inset'
+                : selectedSide === 'B' ? 'opacity-70'
+                : 'opacity-100'}`}
+            onClick={() => handleClick('A')}
+            onDoubleClick={(e) => handleDoubleClick('A', e)}
+          >
+            <img
+              src={currentSet.imgA}
+              alt={currentSet.itemA}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+            <div className="absolute bottom-6 left-6 right-6">
+              <h3 className={`text-xl font-bold drop-shadow-md transition-colors duration-300 ${selectedSide === 'A' ? 'text-red-500' : 'text-white'}`}>{currentSet.itemA}</h3>
+              <div className="flex items-center gap-2 mt-1 text-sm text-white/80">
+                <Users size={14} />
+                <span>{displayVotesA.toLocaleString()}명 참여 중</span>
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/20 overflow-hidden">
+                <div
+                  className="h-full bg-blue-400 rounded-full transition-all duration-300"
+                  style={{ width: `${pctA}%` }}
+                />
+              </div>
+              <p className="text-xs text-white/60 mt-1">{pctA}%</p>
+            </div>
+
+            {isWinnerRevealed && votedSide === 'A' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-6 py-3 rounded-2xl font-black text-xl flex items-center gap-2 shadow-xl animate-bounce">
+                  <Trophy size={24} /> 응모완료!
+                </div>
+              </div>
+            )}
+
+            <div className="absolute top-12 left-6 bg-black/40 p-2 rounded-full backdrop-blur-sm border border-white/10">
+              <Volume2 size={16} />
+            </div>
+
+            {/* 툴팁 - Section A */}
+            {!votedSide && selectedSide === 'A' && (
+              <div className="animate-blink absolute top-5 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-xs font-medium z-20 whitespace-nowrap pointer-events-none">
+                <span className="text-yellow-200 font-bold">클릭</span><span className="text-white font-bold">(선택)</span>
+                <span className="mx-2"> </span>
+                <span className="text-yellow-400 font-bold">더블클릭</span><span className="text-white font-bold">(이벤트참여)</span>
+              </div>
+            )}
+            {!votedSide && !selectedSide && (
+              <div className="animate-blink absolute top-5 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-xs font-medium z-20 whitespace-nowrap pointer-events-none">
+                <span className="text-yellow-200 font-bold">클릭</span><span className="text-white font-bold">(선택)</span>
+                <span className="mx-2"> </span>
+                <span className="text-yellow-400 font-bold">더블클릭</span><span className="text-white font-bold">(이벤트참여)</span>
+              </div>
+            )}
+
+            <ChatFeed active={selectedSide === 'A'} />
+          </div>
+
+          {/* VS 배지 */}
+          <div className="absolute z-10 w-12 h-12 rounded-full bg-white text-black font-black flex items-center justify-center shadow-xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            VS
+          </div>
+
+          {/* Section B */}
+          <div
+            className={`relative flex-1 overflow-hidden transition-all duration-500 cursor-pointer
+              ${isWinnerRevealed && votedSide === 'A' ? 'opacity-40 grayscale blur-sm'
+                : selectedSide === 'B' ? 'opacity-100 ring-4 ring-red-500 ring-inset'
+                : selectedSide === 'A' ? 'opacity-70'
+                : 'opacity-100'}`}
+            onClick={() => handleClick('B')}
+            onDoubleClick={(e) => handleDoubleClick('B', e)}
+          >
+            <img
+              src={currentSet.imgB}
+              alt={currentSet.itemB}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+            <div className="absolute bottom-6 left-6 right-6">
+              <h3 className={`text-xl font-bold drop-shadow-md transition-colors duration-300 ${selectedSide === 'B' ? 'text-red-500' : 'text-white'}`}>{currentSet.itemB}</h3>
+              <div className="flex items-center gap-2 mt-1 text-sm text-white/80">
+                <Users size={14} />
+                <span>{displayVotesB.toLocaleString()}명 참여 중</span>
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/20 overflow-hidden">
+                <div
+                  className="h-full bg-pink-400 rounded-full transition-all duration-300"
+                  style={{ width: `${pctB}%` }}
+                />
+              </div>
+              <p className="text-xs text-white/60 mt-1">{pctB}%</p>
+            </div>
+
+            {isWinnerRevealed && votedSide === 'B' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-6 py-3 rounded-2xl font-black text-xl flex items-center gap-2 shadow-xl animate-bounce">
+                  <Trophy size={24} /> 응모완료!
+                </div>
+              </div>
+            )}
+
+            <div className="absolute top-12 right-6 bg-black/40 p-2 rounded-full backdrop-blur-sm border border-white/10">
+              <Volume2 size={16} />
+            </div>
+
+            {/* 툴팁 - Section B */}
+            {!votedSide && selectedSide === 'B' && (
+              <div className="animate-blink absolute top-5 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-xs font-medium z-20 whitespace-nowrap pointer-events-none">
+                <span className="text-yellow-200 font-bold">클릭</span><span className="text-white font-bold">(선택)</span>
+                <span className="mx-2"> </span>
+                <span className="text-yellow-400 font-bold">더블클릭</span><span className="text-white font-bold">(이벤트참여)</span>
+              </div>
+            )}
+
+            <ChatFeed active={selectedSide === 'B'} />
+          </div>
+
+          {/* 하단 네비게이션 */}
+          <div className="absolute bottom-12 left-0 right-0 flex justify-between px-4 pointer-events-none z-20">
+            <button
+              onClick={(e) => { e.stopPropagation(); prevSet(); }}
+              className={`w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center pointer-events-auto hover:bg-white/40 transition ${votedSide ? 'animate-blink' : ''}`}
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <div className="flex gap-2 items-center">
+              {VS_DATA.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-2 rounded-full transition-all ${i === currentIndex ? 'bg-white w-4' : 'bg-white/40 w-2'}`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); nextSet(); }}
+              className={`w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center pointer-events-auto hover:bg-white/40 transition ${votedSide ? 'animate-blink' : ''}`}
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
+
+          {/* 이미 응모 안내 메시지 */}
+          {showAlreadyVoted && (
+            <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl text-center pointer-events-none">
+              <p className="text-white text-xs font-bold">이미 응모하셨어요 🎁</p>
+              <p className="text-white/60 text-[10px] mt-0.5">다른 상품도 응모해보세요</p>
+            </div>
+          )}
+
+          {/* 이벤트 참여 완료 토스트 */}
+          {votedSide && !isWinnerRevealed && (
+            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold animate-pulse shadow-lg z-20 whitespace-nowrap">
+              참여 완료! 결과를 기다려주세요 🎁
+            </div>
+          )}
+
+
+          {/* 하트 애니메이션 */}
+          {showHeart.active && (
+            <div
+              className="fixed pointer-events-none z-50 text-red-500 animate-ping"
+              style={{ left: showHeart.x - 40, top: showHeart.y - 40 }}
+            >
+              <Heart size={80} fill="currentColor" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <p className="mt-8 text-gray-500 text-xs text-center max-w-xs px-4">
+        더블 탭으로 투표 · 좌우 버튼으로 다음 세트
+      </p>
+    </div>
+  );
+}

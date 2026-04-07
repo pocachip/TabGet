@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@keyframes countPop {
+  0%   { transform: scale(1.5); opacity: 0; }
+  40%  { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.countdown-pop {
+  animation: countPop 0.4s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-message {
+  animation: slideUp 0.35s ease-out forwards;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 0.9s step-start infinite;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: black;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+}

@@ -396,7 +396,7 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen bg-black text-white font-sans overflow-hidden">
-      <div className={`flex w-full h-full ${isPortrait ? 'flex-row' : 'flex-col'}`}>
+      <div className={`flex w-full h-full ${isPortrait ? 'flex-col' : 'flex-row'}`}>
 
           {/* Section A */}
           <div
